@@ -1,0 +1,481 @@
+@import 'tailwindcss';
+
+/* --- CSS VARIABLES (THEME ENGINE) --- */
+:root {
+    /* LIGHT MODE (Current Default) */
+    --bg-body: #f8fafc;
+    --bg-nav: #ffffff;
+    --bg-card: #ffffff;
+    --text-main: #0f172a;
+    --text-muted: #64748b;
+    --border-color: #e2e8f0;
+    --primary-color: #2563eb;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    
+    /* Card Specific Borders (Light Mode - Subtle) */
+    --phishing-color: #2563eb;
+    --malware-color: #dc2626;
+    --spam-color: #d97706;
+}
+
+/* DARK MODE (Based on your Image) */
+[data-theme="dark"] {
+    --bg-body: #0B1120; /* Deep Cyber Navy */
+    --bg-nav: #0f172a;
+    --bg-card: #1e293b; /* Lighter Navy for cards */
+    --text-main: #f1f5f9; /* White-ish text */
+    --text-muted: #94a3b8;
+    --border-color: #334155;
+    --primary-color: #38bdf8; /* Cyan for buttons */
+    --shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+
+    /* Neon Glow Colors */
+    --phishing-color: #06b6d4; /* Cyan Neon */
+    --malware-color: #ef4444; /* Red Neon */
+    --spam-color: #f59e0b;    /* Orange Neon */
+}
+
+/* --- BASE STYLES --- */
+* { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s; }
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--bg-body);
+    color: var(--text-main);
+    line-height: 1.6;
+}
+
+a { text-decoration: none; color: inherit; }
+ul { list-style: none; }
+
+.container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* --- NAVIGATION --- */
+.navbar {
+    background-color: var(--bg-nav);
+    border-bottom: 1px solid var(--border-color);
+    padding: 1rem 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+.nav-content { display: flex; justify-content: space-between; align-items: center; }
+.logo { font-size: 1.5rem; font-weight: 800; color: var(--text-main); letter-spacing: 1px; }
+
+.nav-actions { display: flex; align-items: center; gap: 15px; }
+
+/* --- BUTTONS --- */
+.btn { padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 600; cursor: pointer; border: 1px solid transparent; }
+.btn-primary { background-color: var(--primary-color); color: #fff; }
+.btn-outline { border-color: var(--text-main); color: var(--text-main); background: transparent; }
+.btn-outline:hover { background-color: rgba(255,255,255,0.1); }
+
+/* --- HERO SECTION --- */
+.hero { padding: 5rem 0; text-align: center; }
+.hero h1 { font-size: 3rem; margin-bottom: 1rem; color: var(--text-main); }
+.hero p { color: var(--text-muted); font-size: 1.2rem; max-width: 600px; margin: 0 auto 2rem; }
+
+/* --- 1. DASHBOARD GRID LAYOUT --- */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive 3-column layout */
+    gap: 2rem; /* Space between cards */
+    margin-top: 2rem;
+}
+
+/* --- 2. CARD BASE STYLES --- */
+.card {
+    background-color: var(--bg-card); /* Dark Grey/Black */
+    border: 2px solid var(--border-color); /* Thicker border for visibility */
+    border-radius: 16px;
+    padding: 2.5rem 2rem; /* More breathing room */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    height: 100%; /* Forces equal height in grid */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* --- 3. NEON VARIANTS --- */
+
+/* Phishing (Cyan) */
+.card-phishing { border-color: rgba(6, 182, 212, 0.3); }
+.card-phishing:hover {
+    transform: translateY(-8px);
+    border-color: #06b6d4;
+    box-shadow: 0 0 20px rgba(6, 182, 212, 0.5); /* Strong Neon Glow */
+}
+.card-phishing .card-icon { text-shadow: 0 0 15px rgba(6, 182, 212, 0.6); }
+
+/* Malware (Purple) */
+.card-malware { border-color: rgba(139, 92, 246, 0.3); }
+.card-malware:hover {
+    transform: translateY(-8px);
+    border-color: #8b5cf6;
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
+}
+.card-malware .card-icon { text-shadow: 0 0 15px rgba(139, 92, 246, 0.6); }
+
+/* Spam (Orange) */
+.card-spam { border-color: rgba(245, 158, 11, 0.3); }
+.card-spam:hover {
+    transform: translateY(-8px);
+    border-color: #f59e0b;
+    box-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+}
+.card-spam .card-icon { text-shadow: 0 0 15px rgba(245, 158, 11, 0.6); }
+
+
+/* --- 4. CARD CONTENT --- */
+.card-icon {
+    font-size: 4rem;
+    margin-bottom: 1.5rem;
+    transition: transform 0.3s;
+}
+
+.card-title {
+    font-size: 2rem; /* Big, bold font */
+    font-weight: 800;
+    margin-bottom: 1rem;
+    color: var(--text-main);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.card-desc {
+    color: var(--text-muted);
+    margin-bottom: 2.5rem; /* Space before buttons */
+    line-height: 1.6;
+    font-size: 1.05rem;
+    flex-grow: 1; /* Pushes buttons to the bottom */
+}
+
+/* --- 5. ACTIONS AREA --- */
+.card-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.btn-block {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    text-align: center;
+}
+
+.learn-link {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-decoration: none;
+    padding: 5px;
+    transition: color 0.2s;
+}
+
+.card-phishing .learn-link:hover { color: #06b6d4; }
+.card-malware .learn-link:hover { color: #8b5cf6; }
+.card-spam .learn-link:hover { color: #f59e0b; }
+/* --- FOOTER --- */
+footer { text-align: center; padding: 2rem; border-top: 1px solid var(--border-color); color: var(--text-muted); }
+
+/* --- DASHBOARD SPECIFIC STYLES --- */
+
+/* Dashboard Layout */
+.dashboard-container { padding: 2rem 0; }
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Split screen 50/50 */
+    gap: 1.5rem;
+}
+
+@media (max-width: 768px) { .dashboard-grid { grid-template-columns: 1fr; } }
+
+/* The "Glass" Panel Look */
+.panel {
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: var(--shadow);
+}
+.panel h3 { font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; color: var(--text-muted); }
+
+/* Custom Checkbox List */
+.checklist-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-main);
+}
+.checklist-item input[type="checkbox"] { accent-color: var(--primary-color); transform: scale(1.2); }
+
+/* --- PHISHING SPECIFIC --- */
+.progress-track {
+    background-color: var(--border-color);
+    height: 12px;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+    overflow: hidden;
+}
+/* --- CONTAINER --- */
+.progress-fill {
+    height: 100%;
+    width: 0%; /* JS updates this */
+    background-color: #06b6d4; /* Default Cyan */
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden; /* Important: Cuts off the sliding overlay */
+    transition: width 0.6s ease-in-out, background-color 0.3s;
+}
+
+/* --- COMPLETED COLOR --- */
+.progress-fill.completed {
+    background-color: #22c55e !important;
+}
+
+/* --- THE SLIDING OVERLAY --- */
+/* --- THE SLIDING STRIPES (Overlay) --- */
+.progress-fill::after {
+    content: "";
+    position: absolute;
+    top: 0; 
+    left: 0; 
+    bottom: 0;
+    
+    /* Extra wide so we have room to slide */
+    width: 200%; 
+    
+    /* 1. DEFINE THE TILE SIZE (Crucial for the loop) */
+    background-size: 50px 50px;
+
+    /* 2. THE PATTERN (Standard Linear Gradient) */
+    background-image: linear-gradient(
+        -45deg, 
+        rgba(255, 255, 255, 0.3) 25%, 
+        transparent 25%, 
+        transparent 50%, 
+        rgba(255, 255, 255, 0.3) 50%, 
+        rgba(255, 255, 255, 0.3) 75%, 
+        transparent 75%, 
+        transparent
+    );
+    
+    /* 3. THE ANIMATION */
+    animation: slideSmoothly 2s linear infinite;
+}
+
+/* --- THE PHYSICAL SLIDE ANIMATION --- */
+@keyframes slideSmoothly {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        /* 4. MOVE EXACTLY ONE TILE WIDTH (Matches background-size above) */
+        transform: translateX(50px); 
+    }
+}
+/* --- MALWARE SPECIFIC --- */
+.upload-zone {
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    background-color: rgba(0,0,0,0.02);
+    transition: all 0.2s;
+}
+.upload-zone:hover { border-color: var(--malware-color); color: var(--malware-color); background-color: rgba(239, 68, 68, 0.05); cursor: pointer; }
+
+/* --- SPAM SPECIFIC --- */
+.email-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background: rgba(255,255,255,0.05);
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 3px solid transparent;
+}
+.email-row.suspicious { border-left-color: var(--spam-color); }
+
+.score-gauge {
+    font-size: 3rem;
+    font-weight: 800;
+    text-align: center;
+    margin: 1rem 0;
+    
+    /* Gradient Text Effect */
+    background: -webkit-linear-gradient(45deg, #ef4444, #f59e0b, #22c55e); /* For Safari/Chrome older versions */
+    background: linear-gradient(45deg, #ef4444, #f59e0b, #22c55e);         /* Standard syntax */
+    
+    /* Clipping the background to the text */
+    -webkit-background-clip: text; /* Required for WebKit browsers (Chrome, Safari) */
+    background-clip: text;         /* Standard property for Firefox, Edge, and future compatibility */
+    
+    /* Making the text transparent so the background shows through */
+    -webkit-text-fill-color: transparent;
+    color: transparent; /* Fallback for standard browsers */
+}
+
+/* --- AUTHENTICATION PAGES --- */
+.auth-container {
+    min-height: 85vh; /* Centers the card vertically */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 420px;
+    background-color: var(--bg-card);
+    padding: 2.5rem;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.auth-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem; color: var(--text-main); }
+.auth-subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 0.9rem; }
+
+/* --- FORM INPUTS --- */
+.form-group { margin-bottom: 1.25rem; text-align: left; }
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-main);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-body); /* Matches background */
+    color: var(--text-main);
+    font-size: 1rem;
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.15); /* Subtle glow */
+}
+
+/* Links (Forgot Password etc) */
+.auth-link { color: var(--primary-color); font-size: 0.85rem; text-decoration: none; }
+.auth-link:hover { text-decoration: underline; }
+
+.learn-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: color 0.2s;
+    margin-left: 15px; /* Spacing from the button */
+}
+.learn-link:hover {
+    color: var(--primary-color);
+    text-decoration: underline;
+}
+
+/* --- PROFILE PAGE STYLES --- */
+.profile-header {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+}
+
+.avatar-circle {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+    color: white;
+    font-size: 2.5rem;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+}
+
+.profile-info h2 { margin: 0; font-size: 2rem; color: var(--text-main); }
+.profile-info p { margin: 5px 0 0; color: var(--text-muted); }
+
+/* STATS GRID */
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+}
+
+.stat-value { font-size: 2.5rem; font-weight: 800; color: var(--primary-color); }
+.stat-label { color: var(--text-muted); font-size: 0.9rem; text-transform: uppercase; letter-spacing: 1px; }
+
+/* MODULE LIST */
+.module-row {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: transform 0.2s;
+}
+.module-row:hover { transform: translateX(5px); border-color: var(--primary-color); }
+
+.module-info { flex-grow: 1; margin-right: 2rem; }
+.module-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 0.5rem; display: block; }
+
+/* TINY PROGRESS BAR */
+.mini-progress-track {
+    width: 100%; height: 8px; background: rgba(255,255,255,0.1);
+    border-radius: 4px; overflow: hidden;
+}
+.mini-progress-fill { height: 100%; background: var(--primary-color); }
