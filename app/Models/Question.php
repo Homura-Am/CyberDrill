@@ -10,9 +10,10 @@ class Question extends Model
     use HasFactory;
     
     protected $fillable = [
-        'module', 'key', 'title', 'type', 
-        'sender_name', 'sender_email', 'subject', 'body', 'options'
-    ];
+    'module', 'key', 'title', 'type', 'sender_name', 
+    'sender_email', 'subject', 'body', 'is_phishing', 
+    'malicious_zone', 'feedback', 'options'
+];
 
     // THIS PART IS CRITICAL
     protected $casts = [

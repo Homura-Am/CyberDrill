@@ -15,6 +15,13 @@
             margin-top: 2rem;
         }
 
+        /* --- NEW: MODULE GRID --- */
+        .module-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+
         /* --- CARDS --- */
         .card-box {
             background: var(--bg-card);
@@ -30,6 +37,7 @@
         }
         .avatar-circle {
             width: 80px; height: 80px;
+            flex-shrink: 0; /* <-- ADD THIS LINE to stop the squishing */
             background: linear-gradient(135deg, var(--primary-color), #3b82f6);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
@@ -58,17 +66,35 @@
         /* --- MODULE LIST --- */
         .module-item {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 15px; border-bottom: 1px solid var(--border-color);
+            padding: 15px; 
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.03); /* Slight background for the boxes */
             transition: 0.2s;
+            border: 1px solid var(--border-color);
         }
-        .module-item:last-child { border-bottom: none; }
-        .module-item:hover { background: rgba(255,255,255,0.02); }
-        .progress-bar-track {
-            width: 100px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden;
+        .module-item:hover { background: rgba(255,255,255,0.06); }
+        
+        /* Module Buttons */
+        .btn-module {
+            padding: 6px 15px;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            color: white;
+            text-decoration: none;
+            font-weight: bold;
+            transition: opacity 0.2s;
+            border: none;
+            cursor: pointer;
         }
-        .progress-bar-fill { height: 100%; background: var(--primary-color); }
+        .btn-module:hover { opacity: 0.8; }
+        .btn-phishing { background-color: #06b6d4; box-shadow: 0 0 10px rgba(6, 182, 212, 0.3); color: #000; }
+        .btn-malware { background-color: #b535f6; box-shadow: 0 0 10px rgba(181, 53, 246, 0.3); }
+        .btn-spam { background-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.3); color: #000; }
 
-        @media (max-width: 900px) { .dashboard-grid { grid-template-columns: 1fr; } }
+        @media (max-width: 900px) { 
+            .dashboard-grid { grid-template-columns: 1fr; } 
+            .module-grid { grid-template-columns: 1fr; } /* Stacks modules on small screens */
+        }
     </style>
 </head>
 <body>
@@ -83,10 +109,10 @@
             </div>
         @endif
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid" style="margin-bottom: 0;">
             
             <div>
-                <div class="card-box">
+                <div class="card-box" style="height: 100%;">
                     <div class="profile-header">
                         <div class="avatar-circle">{{ substr($user->name, 0, 1) }}</div>
                         <div>
@@ -115,58 +141,25 @@
                         <button type="submit" class="btn btn-primary" style="width: 100%;">Save Changes</button>
                     </form>
                 </div>
-
-                <div class="card-box">
-                    <h3 style="margin-bottom: 15px; font-size: 1.1rem;">Module History</h3>
-                    
-                    <div class="module-item" style="border-left: 3px solid #06b6d4; padding-left: 15px;">
-                        <div>
-                            <strong style="display: block;">Phishing Defense</strong>
-                            <small style="color: var(--text-muted);">
-                                {{ $stats['attempted'] }} Scenarios Faced across {{ $stats['total_runs'] ?? 1 }} Runs
-                            </small>
-                        </div>
-                        
-                        <a href="{{ route('phishing.index') }}" class="btn btn-primary" style="padding: 6px 15px; font-size: 0.8rem;">
-                            Start New Run
-                        </a>
-                    </div>
-
-                    <div class="module-item" style="border-left: 3px solid #8b5cf6; padding-left: 15px; opacity: 0.6;">
-                        <div>
-                            <strong style="display: block;">Malware Awareness</strong>
-                            <small style="color: var(--text-muted);">Not Started</small>
-                        </div>
-                        <button class="btn btn-outline" disabled style="padding: 4px 10px; font-size: 0.8rem;">Locked</button>
-                    </div>
-
-                    <div class="module-item" style="border-left: 3px solid #f59e0b; padding-left: 15px; opacity: 0.6;">
-                        <div>
-                            <strong style="display: block;">Spam Defense</strong>
-                            <small style="color: var(--text-muted);">Not Started</small>
-                        </div>
-                        <button class="btn btn-outline" disabled style="padding: 4px 10px; font-size: 0.8rem;">Locked</button>
-                    </div>
-                </div>
             </div>
 
             <div>
                 <div class="stats-row">
                     <div class="stat-item">
-                        <div class="stat-num">{{ $stats['score'] }}%</div>
+                        <div class="stat-num">{{ $stats['score'] ?? 0 }}%</div>
                         <div class="stat-label">Avg. Accuracy</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-num">{{ $stats['attempted'] }}</div>
+                        <div class="stat-num">{{ $stats['attempted'] ?? 0 }}</div>
                         <div class="stat-label">Total Scenarios</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-num" style="color: #22c55e;">{{ $stats['correct'] }}</div>
+                        <div class="stat-num" style="color: #22c55e;">{{ $stats['correct'] ?? 0 }}</div>
                         <div class="stat-label">Threats Stopped</div>
                     </div>
                 </div>
 
-                <div class="card-box">
+                <div class="card-box" style="margin-bottom: 0;">
                     <h3 style="margin-bottom: 20px;">Performance Analysis</h3>
                     
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
@@ -189,14 +182,62 @@
                 </div>
             </div>
 
-<script>
+        </div>
+
+        <div class="card-box" style="margin-top: 2rem;">
+            <h3 style="margin-bottom: 20px; font-size: 1.1rem;">Module Access & History</h3>
+            
+            <div class="module-grid">
+                
+                <div class="module-item" style="border-left: 4px solid #06b6d4;">
+                    <div>
+                        <strong style="display: block;">Phishing Defense</strong>
+                        <small style="color: var(--text-muted);">
+                            {{ $phishingStats['attempted'] ?? ($stats['attempted'] ?? 0) }} Scenarios Faced
+                        </small>
+                    </div>
+                    <a href="{{ route('phishing.index') }}" class="btn-module btn-phishing">
+                        Start Run
+                    </a>
+                </div>
+
+                <div class="module-item" style="border-left: 4px solid #b535f6;">
+                    <div>
+                        <strong style="display: block;">Malware Sandbox</strong>
+                        <small style="color: var(--text-muted);">
+                            {{ $malwareStats['attempted'] ?? 0 }} Artifacts Analyzed
+                        </small>
+                    </div>
+                    <a href="{{ route('malware') }}" class="btn-module btn-malware">
+                        Start Run
+                    </a>
+                </div>
+
+                <div class="module-item" style="border-left: 4px solid #f59e0b;">
+                    <div>
+                        <strong style="display: block;">Spam Defense</strong>
+                        <small style="color: var(--text-muted);">
+                            {{ $spamStats['attempted'] ?? 0 }} Emails Filtered
+                        </small>
+                    </div>
+                    <a href="{{ route('spam') }}" class="btn-module btn-spam">
+                        Start Run
+                    </a>
+                </div>
+
+            </div>
+        </div>
+        
+    </div>
+
+    <script>
         // --- 1. DOUGHNUT CHART (Lifetime Correct vs Incorrect) ---
         new Chart(document.getElementById('doughnutChart'), {
             type: 'doughnut',
             data: {
                 labels: ['Correct Actions', 'Incorrect Actions'],
                 datasets: [{
-                    data: @json($chartData), // [Total Correct, Total Incorrect]
+                    data: @json($chartData ?? [0, 0]), 
                     backgroundColor: ['#22c55e', '#ef4444'],
                     borderWidth: 0,
                     cutout: '70%'
@@ -213,10 +254,10 @@
         new Chart(document.getElementById('lineChart'), {
             type: 'line',
             data: {
-                labels: @json($lineChartLabels), // Dates
+                labels: @json($lineChartLabels ?? []), 
                 datasets: [{
                     label: 'Attempt Score (%)',
-                    data: @json($lineChartData), // Scores (e.g. 80, 100, 50)
+                    data: @json($lineChartData ?? []), 
                     borderColor: '#06b6d4',
                     backgroundColor: 'rgba(6, 182, 212, 0.1)',
                     borderWidth: 2,
@@ -230,7 +271,7 @@
                 maintainAspectRatio: false,
                 plugins: { legend: { display: false } },
                 scales: {
-                    x: { ticks: { display: false }, grid: { display: false } }, // Hide messy dates
+                    x: { ticks: { display: false }, grid: { display: false } }, 
                     y: { 
                         min: 0, max: 100,
                         ticks: { color: '#94a3b8', stepSize: 25 }, 

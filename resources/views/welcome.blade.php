@@ -129,7 +129,7 @@
                 <h2 class="card-title">Malware</h2>
                 <p class="card-desc">Understand viruses and ransomware. Learn safe file handling.</p>
                 <div class="card-actions">
-                    <button class="btn btn-primary btn-block" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</button>
+                    <a href="{{ route('malware') }}" class="btn btn-primary btn-block">Start Simulation</a>
                     <a href="{{ route('learn.malware') }}" class="learn-link">Learn More &rarr;</a>
                 </div>
             </div>
@@ -139,7 +139,7 @@
                 <h2 class="card-title">Spam Defense</h2>
                 <p class="card-desc">Reclaim your inbox. Learn to filter junk mail effectively.</p>
                 <div class="card-actions">
-                    <button class="btn btn-primary btn-block" style="opacity: 0.5; cursor: not-allowed;">Coming Soon</button>
+                    <a href="{{ route('spam') }}" class="btn btn-primary btn-block">Start Simulation</a>
                     <a href="{{ route('learn.spam') }}" class="learn-link">Learn More &rarr;</a>
                 </div>
             </div>
