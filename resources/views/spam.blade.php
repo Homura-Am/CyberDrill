@@ -77,11 +77,11 @@
             70% { transform: translate(3px, 1px) rotate(-1deg); }
             80% { transform: translate(-1px, -1px) rotate(1deg); }
             90% { transform: translate(1px, 2px) rotate(0deg); }
-            100% { transform: translate(1px, -2px) rotate(-1deg); }
+            100% { transform: translate(1px, -2px) rotate(0deg); }
         }
 
         .shake-active {
-            animation: damage-shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+            animation: damage-shake 0.4s cubic-bezier(.36,.07,.19,.97);
         }
 
         /* --- LAYOUT: EMAIL + STOPWATCH --- */
@@ -358,7 +358,10 @@
                 display: inline-flex; align-items: center; justify-content: center;letter-spacing: 0.5px;box-shadow: 0 4px 6px rgba(0,0,0,0.2);"onclick="window.location.reload()">RETURN TO SIMULATION
         </button>
     </div>
-    
+    <div class="module-footer" style="border-top-color: rgba(245, 158, 11, 0.2);">
+    <p><strong>Scenario References & Copyright:</strong> Spam triage scenarios, including inheritance scams and homograph attacks, are directly modeled after real-world threat intelligence and consumer alerts identified by the <strong>FTC</strong> and <strong>CISA</strong>.</p>
+    <p style="margin-top: 8px; opacity: 0.7;">© {{ date('Y') }} CyberDrill Simulation Platform. All rights reserved for educational use.</p>
+</div>
 
     <script>
     const scenarios = @json($scenarios ?? []);
@@ -385,6 +388,7 @@
         healthGone: new Audio('/sounds/health_gone.mp3'),
         shiftEnd: new Audio('/sounds/shift_end.mp3')
     };
+
 
     window.onload = () => {
         sfx.openPage.play().catch(e => console.log('Audio autoplay prevented'));
@@ -423,9 +427,12 @@
         const countdownNumber = document.getElementById('countdown-number');
         countdownScreen.style.display = 'flex';
         
+        
         let count = 3;
         countdownNumber.innerText = count;
+        sfx.countdown.volume = 0.2;
         sfx.countdown.play();
+
 
         const countdownInterval = setInterval(() => {
             count--;
@@ -449,6 +456,7 @@
         clearInterval(timerInterval); 
         
         sfx.timerTick.currentTime = 0;
+        sfx.timerTick.volume = 0.2;
         sfx.timerTick.play();
         
         timerInterval = setInterval(() => {
@@ -501,6 +509,9 @@
         else {
             overlay.classList.add('flash-danger');
             body.classList.add('shake-active');
+            setTimeout(() => {
+                body.classList.remove('shake-active');
+            }, 400);
         }
     }
 

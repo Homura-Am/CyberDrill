@@ -195,4 +195,6 @@ class SimulationController extends Controller
 
         return response()->json(['score' => $score]);
     }
+
+    
 }

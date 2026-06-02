@@ -79,7 +79,7 @@
         
         .placed-flag { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); z-index: 3; }
 
-        .audit-panel { width: 280px; background: #f8fafc; border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; }
+        .audit-panel { width: 320px; background: #f8fafc; border-left: 1px solid #e2e8f0; padding: 20px; display: flex; flex-direction: column; overflow-y: auto; }
         .audit-header { font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; text-transform: uppercase; font-size: 0.9rem; letter-spacing: 0.5px; }
         
         .draggable-flag { padding: 12px; background: #ffffff !important; color: #0f172a !important; border: 1px solid #e2e8f0; border-radius: 8px; margin-bottom: 10px; cursor: grab; display: flex; align-items: center; gap: 10px; font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
@@ -106,8 +106,8 @@
         .sms-meta { text-align: center; font-size: 0.75rem; color: #94a3b8; margin-bottom: 15px; }
         .sms-input { padding: 15px; background: #f8fafc; border-top: 1px solid #e2e8f0; display: flex; align-items: center; gap: 10px; }
         .sms-pill { flex: 1; border: 1px solid #cbd5e1; border-radius: 20px; padding: 8px 15px; color: #94a3b8; font-size: 0.9rem; }
-        .audit-panel-phone { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); width: 250px; background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
-
+        .audit-panel-phone { position: absolute; right: 40px; top: 50%; transform: translateY(-50%); width: 300px; /* --- NEW SCROLL FIX --- */max-height: 80vh; /* Keeps the panel smaller than the screen height */overflow-y: auto; 
+        /* Enables vertical scrolling */display: flex;flex-direction: column;background: white; padding: 20px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); border: 1px solid #e2e8f0; }
         .result-view { text-align: center; padding: 40px; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; width: 100%; background: white; }
     </style>
 </head>
@@ -194,6 +194,10 @@
     <div id="simulation-modal" class="modal-overlay">
         <div class="modal-content" id="modal-content-box"></div>
     </div>
+    <div class="module-footer">
+    <p><strong>Scenario References & Copyright:</strong> Educational scenarios and social engineering artifacts are adapted for academic purposes, inspired by industry-standard training frameworks including the <a href="https://phishingquiz.withgoogle.com/" target="_blank">Google Jigsaw Phishing Quiz</a> (Google, 2018), <a href="https://cofense.com/" target="_blank">Cofense PhishMe</a>, and <a href="https://www.knowbe4.com/" target="_blank">KnowBe4</a>.</p>
+    <p style="margin-top: 8px; opacity: 0.7;">© {{ date('Y') }} CyberDrill Simulation Platform. All rights reserved for educational use.</p>
+</div>
 
     <script>
         // --- SOUND EFFECTS SETUP ---
@@ -216,17 +220,10 @@
         let currentScenarioId = null;
         let requiredZones = 3; 
         let activeFlags = {};
-        
-        // This variable secures the color state universally across all browsers
         let draggedFlagColor = null; 
 
-        function checkInstructions() {
-            document.getElementById('instruction-modal').style.display = 'flex';
-        }
-
-        function dismissInstructions() {
-            document.getElementById('instruction-modal').style.display = 'none';
-        }
+        function checkInstructions() { document.getElementById('instruction-modal').style.display = 'flex'; }
+        function dismissInstructions() { document.getElementById('instruction-modal').style.display = 'none'; }
 
         function renderList() {
             const list = document.getElementById('scenario-list');
@@ -277,7 +274,6 @@
             if (isSms) {
                 return htmlString.replace(/(https?:\/\/[^\s]+)/gi, '<a href="#" class="fake-link" title="$1" style="color: #2563eb; text-decoration: underline;" onclick="handleAction(\'link\'); return false;">$1</a>');
             }
-
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlString, 'text/html');
             let destUrl = '';
@@ -301,7 +297,6 @@
                 btn.title = destUrl || 'http://unknown-destination.com';
                 btn.setAttribute('onclick', "handleAction('link'); return false;");
             });
-
             return doc.body.innerHTML;
         }
 
@@ -343,7 +338,7 @@
 
                 <div style="margin-top: auto;">
                     <div id="hint-box" style="display:none; background: #fffbeb; border: 1px solid #fde68a; padding: 12px; border-radius: 8px; font-size: 0.85rem; color: #92400e; margin-bottom: 15px; line-height: 1.4;">
-                        <strong>Analysis Hint:</strong> ${data.feedback}
+                        <strong>Analysis Hint:</strong> ${data.feedback || 'Review the highlighted zones.'}
                     </div>
                     <button id="hint-btn" class="btn-modern btn-ghost" style="width: 100%; margin-bottom: 15px; justify-content: center; background: #fffbeb; color: #d97706; border-color: #fde68a;" onclick="document.getElementById('hint-box').style.display='block'; this.style.display='none';">
                         <span class="material-symbols-outlined">lightbulb</span> Need a Hint?
@@ -444,30 +439,23 @@
             modal.style.display = 'flex';
         }
 
-        // --- DRAG AND DROP HANDLERS FIX ---
+        // --- DRAG AND DROP HANDLERS ---
         function drag(ev) { 
-            draggedFlagColor = ev.currentTarget.getAttribute('data-color'); // Set global fallback
-            ev.dataTransfer.setData("text/plain", draggedFlagColor); // Use standard text/plain MIME type
+            draggedFlagColor = ev.currentTarget.getAttribute('data-color');
+            ev.dataTransfer.setData("text/plain", draggedFlagColor);
             document.querySelectorAll('.drop-zone').forEach(zone => zone.classList.add('active-drag'));
         }
-        
-        function dragEnd(ev) {
-            document.querySelectorAll('.drop-zone').forEach(zone => zone.classList.remove('active-drag'));
-        }
-
+        function dragEnd(ev) { document.querySelectorAll('.drop-zone').forEach(zone => zone.classList.remove('active-drag')); }
         function allowDrop(ev) { ev.preventDefault(); ev.currentTarget.classList.add('drag-over'); }
         function dragLeave(ev) { ev.currentTarget.classList.remove('drag-over'); }
         
         function drop(ev, zoneId) {
             ev.preventDefault();
             ev.currentTarget.classList.remove('drag-over');
-            
             document.querySelectorAll('.drop-zone').forEach(zone => zone.classList.remove('active-drag'));
-
-            // Safely fetch color, fallback to global variable if dataTransfer is wiped by the browser
-            const color = ev.dataTransfer.getData("text/plain") || draggedFlagColor;
             
-            if (!color) return; // Failsafe
+            const color = ev.dataTransfer.getData("text/plain") || draggedFlagColor;
+            if (!color) return; 
 
             document.getElementById(`flag-${zoneId}`).innerHTML = color === 'red' ? '<span class="material-symbols-outlined flag-danger">flag</span>' : '<span class="material-symbols-outlined flag-safe">check_circle</span>';
             activeFlags[zoneId] = color;
@@ -497,48 +485,112 @@
             const isPhishing = scenario.is_phishing === true || scenario.is_phishing === '1' || scenario.is_phishing === 1; 
             
             let targetZones = [];
-            let rawZone = (scenario.malicious_zone || '').toLowerCase();
+            let rawZone = String(scenario.malicious_zone || '').toLowerCase();
             
-            if (rawZone.includes('subject') || rawZone.includes('header') || rawZone === 'zone1') targetZones.push('zone1');
-            if (rawZone.includes('sender') || rawZone.includes('email') || rawZone === 'zone2') targetZones.push('zone2');
-            if (rawZone.includes('body') || rawZone.includes('link') || rawZone.includes('content') || rawZone === 'zone3') targetZones.push('zone3');
+            // --- UPDATED MULTI-ZONE SUPPORT ---
+            // If rawZone contains multiple keywords (e.g. "sender, link"), both will be pushed to the array.
+            if (rawZone.includes('subject') || rawZone.includes('header') || rawZone.includes('zone1')) targetZones.push('zone1');
+            if (rawZone.includes('sender') || rawZone.includes('email') || rawZone.includes('zone2')) targetZones.push('zone2');
+            if (rawZone.includes('body') || rawZone.includes('link') || rawZone.includes('content') || rawZone.includes('zone3')) targetZones.push('zone3');
             
+            // Fallback if phishing is true but no zone specified
             if (isPhishing && targetZones.length === 0) {
                 targetZones.push(scenario.type === 'email' ? 'zone3' : 'zone2');
             }
 
             let correctFlags = 0;
+            let zoneFeedbackHTML = '';
+
             for (let i = 1; i <= requiredZones; i++) {
                 const z = 'zone' + i;
                 const isZoneMalicious = targetZones.includes(z);
                 
+                let isCorrect = false;
                 if (isZoneMalicious) { 
-                    if (activeFlags[z] === 'red') correctFlags++; 
+                    if (activeFlags[z] === 'red') { correctFlags++; isCorrect = true; }
                 } else { 
-                    if (activeFlags[z] === 'green') correctFlags++; 
+                    if (activeFlags[z] === 'green') { correctFlags++; isCorrect = true; }
+                }
+
+                const zoneName = i === 1 ? (scenario.type === 'email' ? 'Subject / Header' : 'Message Header') : (i === 2 ? (scenario.type === 'email' ? 'Sender Identity' : 'Message Body') : 'Message Body / Links');
+                
+                // --- NEW DYNAMIC EXPLANATION LOGIC ---
+                let zoneExplanation = "";
+                let customFeedback = scenario['feedback_' + z] || null; 
+                
+                if (customFeedback) {
+                    zoneExplanation = customFeedback;
+                } else {
+                    if (isZoneMalicious) {
+                        if (i === 1) zoneExplanation = "This section uses urgent, alarming, or irregular language typical of social engineering.";
+                        if (i === 2) zoneExplanation = "The sender details are forged, misspelled, or originate from an untrusted external domain.";
+                        if (i === 3) zoneExplanation = "The content contains suspicious links, unexpected attachments, or requests for sensitive data.";
+                    } else {
+                        if (i === 1) zoneExplanation = "The context and language used here match normal, expected communication patterns.";
+                        if (i === 2) zoneExplanation = "The sender's address and domain match the verified organization's official records.";
+                        if (i === 3) zoneExplanation = "The message body is standard and links/destinations safely match their display text.";
+                    }
+                }
+
+                zoneFeedbackHTML += `
+                    <div style="margin-bottom: 12px; padding: 12px; background: ${isCorrect ? '#f0fdf4' : '#fef2f2'}; border-radius: 8px; border: 1px solid ${isCorrect ? '#bbf7d0' : '#fecaca'}; display: flex; align-items: flex-start; gap: 10px;">
+                        <span class="material-symbols-outlined" style="color: ${isCorrect ? '#16a34a' : '#dc2626'}; font-size: 1.5rem; margin-top: 2px;">${isCorrect ? 'check_circle' : 'cancel'}</span>
+                        <div style="display: flex; flex-direction: column; width: 100%;">
+                            <div style="font-weight: 700; color: #0f172a; font-size: 0.95rem;">${zoneName}</div>
+                            <div style="color: #475569; font-size: 0.85rem; margin-top: 4px;">
+                                You marked: <strong style="color: ${activeFlags[z] === 'red' ? '#dc2626' : '#16a34a'}">${activeFlags[z] === 'red' ? 'Suspicious' : 'Safe'}</strong> 
+                                <span style="opacity: 0.7;">(Should be ${isZoneMalicious ? 'Suspicious' : 'Safe'})</span>
+                            </div>
+                            <div style="color: ${isCorrect ? '#166534' : '#991b1b'}; font-size: 0.85rem; margin-top: 8px; padding-top: 8px; border-top: 1px dashed ${isCorrect ? '#bbf7d0' : '#fecaca'}; line-height: 1.4;">
+                                <strong>Analysis:</strong> ${zoneExplanation}
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Highlight the actual drop zones in the inbox visually
+                const zoneEl = document.getElementById('zone-' + i);
+                if (zoneEl) {
+                    zoneEl.style.border = isCorrect ? '2px solid #16a34a' : '2px solid #dc2626';
+                    zoneEl.style.backgroundColor = isCorrect ? 'rgba(22, 163, 74, 0.05)' : 'rgba(220, 38, 38, 0.05)';
+                    zoneEl.style.borderRadius = '8px';
                 }
             }
 
             let result = (actionType === 'report' && isPhishing) || (actionType !== 'report' && !isPhishing) ? 'correct' : 'incorrect';
-            let fb = result === 'correct' ? (isPhishing ? 'Threat Neutralized.' : 'Legitimate communication verified.') : (isPhishing ? 'Security Breach. You interacted with a payload.' : 'False Positive. You reported safe mail.');
-
+            
             if (result === 'correct') {
-                sfxCorrect.currentTime = 0;
-                sfxCorrect.play().catch(e => console.log("Audio play blocked by browser:", e));
+                sfxCorrect.currentTime = 0; sfxCorrect.play().catch(e => console.log("Audio block:", e));
             } else {
-                sfxWrong.currentTime = 0;
-                sfxWrong.play().catch(e => console.log("Audio play blocked by browser:", e));
+                sfxWrong.currentTime = 0; sfxWrong.play().catch(e => console.log("Audio block:", e));
             }
 
-            document.getElementById('modal-content-box').innerHTML = `
-                <div class="result-view">
-                    <span class="material-symbols-outlined" style="color: ${result === 'correct' ? '#16a34a' : '#dc2626'}; font-size: 5rem; margin-bottom: 20px;">${result === 'correct' ? 'gpp_good' : 'warning'}</span>
-                    <h2 style="color: ${result === 'correct' ? '#16a34a' : '#dc2626'}; font-size: 2.5rem; margin-bottom: 15px;">${result === 'correct' ? 'Correct Action' : 'Action Failed'}</h2>
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 10px 20px; border-radius: 20px; font-weight: 600; font-size: 1.1rem; color: #0f172a; margin-bottom: 25px;">Flags Accurate: ${correctFlags} / ${requiredZones}</div>
-                    <p style="font-size: 1.2rem; color: #475569; max-width: 500px; margin-bottom: 40px;">${fb}</p>
-                    <button onclick="closeSimulationAndSave('${result}')" class="btn-modern" style="background: ${result === 'correct' ? '#16a34a' : '#dc2626'}; color: white; padding: 15px 30px; font-size: 1.1rem;">Return to Dashboard</button>
-                </div>
-            `;
+            const auditPanel = document.querySelector('.audit-panel') || document.querySelector('.audit-panel-phone');
+            
+            if (auditPanel) {
+                const warningOl = document.getElementById('warning-overlay');
+                if (warningOl) warningOl.style.display = 'none';
+
+                auditPanel.innerHTML = `
+                    <div style="text-align: center; margin-bottom: 20px;">
+                        <span class="material-symbols-outlined" style="color: ${result === 'correct' ? '#16a34a' : '#dc2626'}; font-size: 4rem;">${result === 'correct' ? 'gpp_good' : 'warning'}</span>
+                        <h2 style="color: ${result === 'correct' ? '#16a34a' : '#dc2626'}; font-size: 1.4rem; margin: 5px 0 15px;">${result === 'correct' ? 'Correct Action' : 'Action Failed'}</h2>
+                        <div style="display: inline-block; background: #e2e8f0; padding: 6px 12px; border-radius: 20px; font-weight: 700; font-size: 0.9rem; color: #0f172a;">Flags Accurate: ${correctFlags} / ${requiredZones}</div>
+                    </div>
+                    
+                    <div style="margin-bottom: 20px;">
+                        <h4 style="font-size: 0.85rem; color: #64748b; text-transform: uppercase; margin-bottom: 10px;">Flag Breakdown</h4>
+                        ${zoneFeedbackHTML}
+                    </div>
+
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 15px; border-radius: 8px; font-size: 0.9rem; color: #334155; margin-bottom: 20px; line-height: 1.5;">
+                        <strong style="color: #0f172a;">Overall Scenario Feedback:</strong><br/>
+                        ${scenario.feedback || 'Review the detailed analysis tags above for more insight on this communication.'}
+                    </div>
+                    
+                    <button onclick="closeSimulationAndSave('${result}')" class="btn-modern" style="width: 100%; justify-content: center; background: ${result === 'correct' ? '#16a34a' : '#dc2626'}; color: white; padding: 12px; font-size: 1rem;">Save & Return</button>
+                `;
+            }
         }
 
         function closeSimulationAndSave(status) {
@@ -582,8 +634,7 @@
             .then(res => res.json())
             .then(data => {
                 if(data.success) {
-                    sfxSubmit.currentTime = 0;
-                    sfxSubmit.play().catch(e => console.log("Audio block:", e));
+                    sfxSubmit.currentTime = 0; sfxSubmit.play().catch(e => console.log("Audio block:", e));
                     
                     const modal = document.getElementById('simulation-modal');
                     const contentBox = document.getElementById('modal-content-box');
@@ -616,8 +667,7 @@
         window.onload = () => { 
             checkInstructions();
             renderList(); 
-            sfxOpen.currentTime = 0;
-            sfxOpen.play().catch(e => console.log("Audio play blocked by browser:", e));
+            sfxOpen.currentTime = 0; sfxOpen.play().catch(e => console.log("Audio play blocked by browser:", e));
         };
     </script>
 </body>

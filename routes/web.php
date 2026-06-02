@@ -77,6 +77,7 @@ Route::middleware(['auth'])->group(function () {
 Route::get('/spam', [\App\Http\Controllers\SimulationController::class, 'showSpam'])->name('spam');
 Route::post('/spam/update', [\App\Http\Controllers\SimulationController::class, 'updateSpam']);
 Route::post('/spam/submit', [\App\Http\Controllers\SimulationController::class, 'submitSpam']);
+Route::get('/certificate', [ProfileController::class, 'showCertificate'])->name('certificate');
 
 });
 
@@ -91,6 +92,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/admin', [AdminController::class, 'index'])->name('admin.dashboard');
     Route::get('/admin/export', [AdminController::class, 'export'])->name('admin.export');
     Route::delete('/admin/attempt/{id}', [AdminController::class, 'deleteAttempt'])->name('admin.deleteAttempt');
+    Route::resource('questions', AdminQuestionController::class);
+    
 
     // Question Management (Phishing)
     Route::resource('/admin/questions', AdminQuestionController::class, [

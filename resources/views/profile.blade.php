@@ -100,7 +100,32 @@
 <body>
 
     @include('partials.navbar')
+@php
+    // Quick check to see if they unlock the certificate
+    $phishScore = \App\Models\SimulationAttempt::where('user_id', Auth::id())->where('module', 'phishing')->max('score') ?? 0;
+    $malwScore = \App\Models\SimulationAttempt::where('user_id', Auth::id())->where('module', 'malware')->max('score') ?? 0;
+    $spamScore = \App\Models\SimulationAttempt::where('user_id', Auth::id())->where('module', 'spam')->max('score') ?? 0;
+    
+    $earnedCertificate = ($phishScore >= 80 && $malwScore >= 80 && $spamScore >= 80);
+@endphp
 
+<div class="panel" style="text-align: center; margin-top: 2rem;">
+    <h3 style="color: var(--primary-color);">🏆 Cyber Security Certification</h3>
+    
+    @if($earnedCertificate)
+        <p style="color: #22c55e; margin-bottom: 15px;">Congratulations! You have passed all modules.</p>
+        <a href="{{ route('certificate') }}" class="btn btn-primary" target="_blank">
+            View & Print Certificate
+        </a>
+    @else
+        <p style="color: var(--text-muted);">Score 80% or higher on Phishing, Malware, and Spam to unlock your official certificate.</p>
+        <div style="opacity: 0.5; margin-top: 15px;">
+            <button class="btn" disabled style="background: var(--border-color); color: var(--text-muted); cursor: not-allowed;">
+                🔒 Certificate Locked
+            </button>
+        </div>
+    @endif
+</div>
     <div class="container">
         
         @if(session('success'))
@@ -192,8 +217,9 @@
                 <div class="module-item" style="border-left: 4px solid #06b6d4;">
                     <div>
                         <strong style="display: block;">Phishing Defense</strong>
-                        <small style="color: var(--text-muted);">
-                            {{ $phishingStats['attempted'] ?? ($stats['attempted'] ?? 0) }} Scenarios Faced
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+                            {{ $phishingStats['attempted'] ?? ($stats['attempted'] ?? 0) }} Scenarios Faced<br>
+                            <span style="color: #06b6d4; font-weight: bold;">High Score: {{ $phishingStats['high_score'] ?? 0 }}%</span>
                         </small>
                     </div>
                     <a href="{{ route('phishing.index') }}" class="btn-module btn-phishing">
@@ -204,8 +230,9 @@
                 <div class="module-item" style="border-left: 4px solid #b535f6;">
                     <div>
                         <strong style="display: block;">Malware Sandbox</strong>
-                        <small style="color: var(--text-muted);">
-                            {{ $malwareStats['attempted'] ?? 0 }} Artifacts Analyzed
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+                            {{ $malwareStats['attempted'] ?? 0 }} Artifacts Analyzed<br>
+                            <span style="color: #b535f6; font-weight: bold;">High Score: {{ $malwareStats['high_score'] ?? 0 }}%</span>
                         </small>
                     </div>
                     <a href="{{ route('malware') }}" class="btn-module btn-malware">
@@ -216,8 +243,9 @@
                 <div class="module-item" style="border-left: 4px solid #f59e0b;">
                     <div>
                         <strong style="display: block;">Spam Defense</strong>
-                        <small style="color: var(--text-muted);">
-                            {{ $spamStats['attempted'] ?? 0 }} Emails Filtered
+                        <small style="color: var(--text-muted); display: block; margin-top: 4px;">
+                            {{ $spamStats['attempted'] ?? 0 }} Emails Filtered<br>
+                            <span style="color: #f59e0b; font-weight: bold;">High Score: {{ $spamStats['high_score'] ?? 0 }}%</span>
                         </small>
                     </div>
                     <a href="{{ route('spam') }}" class="btn-module btn-spam">

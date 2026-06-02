@@ -6,59 +6,64 @@
     <title>CyberDrill | Security Awareness</title>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <style>
+        /* --- GLOBAL BACKGROUND --- */
+        
+
         /* --- WIDGET STYLES --- */
         .user-widget {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            background: rgba(17, 24, 39, 0.7); 
+            border: 1px solid rgba(0, 209, 255, 0.2); 
             border-radius: 16px;
             padding: 2rem;
-            margin-bottom: 3rem; /* Space below widget */
+            margin-bottom: 3rem; 
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
             position: relative;
             overflow: hidden;
             margin-top: 2rem;
+            backdrop-filter: blur(12px); 
+            -webkit-backdrop-filter: blur(12px);
         }
 
         .user-widget::before {
             content: ''; position: absolute; top: -50px; right: -50px;
-            width: 200px; height: 200px; background: var(--primary-color);
-            opacity: 0.05; border-radius: 50%; blur: 50px; pointer-events: none;
+            width: 200px; height: 200px; background: #00d1ff;
+            opacity: 0.05; border-radius: 50%; filter: blur(50px); pointer-events: none;
         }
 
         .widget-left { display: flex; align-items: center; gap: 20px; z-index: 1; }
         
         .widget-avatar {
             width: 80px; height: 80px;
-            background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+            background: linear-gradient(135deg, #00d1ff, #0055ff);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-size: 2.5rem; color: white; font-weight: bold;
-            box-shadow: 0 0 15px rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 20px rgba(0, 209, 255, 0.4);
         }
 
-        .widget-info h2 { margin: 0; font-size: 1.8rem; color: var(--text-main); }
-        .widget-info p { margin: 5px 0 0; color: var(--text-muted); font-size: 1rem; }
+        .widget-info h2 { margin: 0; font-size: 1.8rem; color: #ffffff; }
+        .widget-info p { margin: 5px 0 0; color: #9ca3af; font-size: 1rem; }
         .kulliyyah-badge {
-            display: inline-block; background: rgba(255, 255, 255, 0.1); 
+            display: inline-block; background: rgba(0, 209, 255, 0.1); 
             padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; margin-top: 8px;
-            border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted);
+            border: 1px solid rgba(0, 209, 255, 0.3); color: #00d1ff;
         }
 
         .widget-stats {
             display: flex; gap: 30px; text-align: center; z-index: 1;
-            border-left: 1px solid var(--border-color); padding-left: 30px;
+            border-left: 1px solid rgba(255,255,255,0.1); padding-left: 30px;
         }
         
-        .ws-item h3 { font-size: 2rem; margin: 0; color: var(--primary-color); }
-        .ws-item span { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ws-item h3 { font-size: 2rem; margin: 0; color: #00d1ff; }
+        .ws-item span { font-size: 0.85rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.5px; }
 
         @media (max-width: 768px) {
             .user-widget { flex-direction: column; text-align: center; gap: 20px; }
             .widget-left { flex-direction: column; }
-            .widget-stats { border-left: none; padding-left: 0; width: 100%; justify-content: space-around; border-top: 1px solid var(--border-color); padding-top: 20px; }
+            .widget-stats { border-left: none; padding-left: 0; width: 100%; justify-content: space-around; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; }
         }
     </style>
 </head>
@@ -80,7 +85,7 @@
                     @if($user->kulliyyah)
                         <span class="kulliyyah-badge">🏛️ {{ $user->kulliyyah }}</span>
                     @else
-                        <a href="{{ route('profile') }}" class="kulliyyah-badge" style="text-decoration: none; color: var(--primary-color); border-color: var(--primary-color);">
+                        <a href="{{ route('profile') }}" class="kulliyyah-badge" style="text-decoration: none;">
                             + Add Kulliyyah
                         </a>
                     @endif
@@ -105,10 +110,10 @@
         @endauth
 
         <div style="text-align: center; margin: 2rem 0 4rem 0;">
-            <h1 style="font-size: 3.5rem; font-weight: 900; margin-bottom: 1rem;">
-                CYBER<span style="color: var(--primary-color);">DRILL</span>
+            <h1 style="font-size: 3.5rem; font-weight: 900; margin-bottom: 1rem; position: relative; z-index: 2;">
+                CYBER<span style="color: #00d1ff; text-shadow: 0 0 15px rgba(0, 209, 255, 0.5);">DRILL</span>
             </h1>
-            <p style="font-size: 1.25rem; color: var(--text-muted); max-width: 600px; margin: 0 auto;">
+            <p style="font-size: 1.25rem; color: #9ca3af; max-width: 600px; margin: 0 auto; position: relative; z-index: 2;">
                 Interactive cybersecurity training simulations. Get to know the cyberthreat around you and test your knowledge.
             </p>
         </div>
@@ -146,12 +151,38 @@
         </div>
 
     </div>
+    <footer class="module-footer" style="border-top-color: rgba(6, 182, 212, 0.3);">
+    <p style="margin-top: 15px; opacity: 0.7;">© {{ date('Y') }} CyberDrill. All rights reserved.</p>
+</footer>
 
     <script>
         if (localStorage.getItem('theme') === 'dark') {
             document.documentElement.setAttribute('data-theme', 'dark');
         }
-    </script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Create the Audio object. 
+            // I put a temporary high-tech "click" sound URL here so you can test it immediately!
+            const hoverSound = new Audio('/sounds/hover.mp3');
+            
+            // Keep the volume subtle (0.2 = 20%) so it isn't annoying
+            hoverSound.volume = 1.0; 
 
+            // 2. Select all the simulation cards
+            const cards = document.querySelectorAll('.card');
+
+            // 3. Attach the sound to the 'mouseenter' (hover) event
+            cards.forEach(card => {
+                card.addEventListener('mouseenter', () => {
+                    // Rewind to start: Allows rapid hovering to trigger the sound instantly every time
+                    hoverSound.currentTime = 0; 
+                    
+                    // Play the sound (the .catch ignores errors if the browser blocks audio before the user clicks anywhere)
+                    hoverSound.play().catch(() => { 
+                        // Silently ignore browser autoplay policies
+                    });
+                });
+            });
+        });
+    </script>
 </body>
 </html>

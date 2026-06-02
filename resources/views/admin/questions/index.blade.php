@@ -1,99 +1,107 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Manage Questions | CyberDrill</title>
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Scenarios</title>
     <style>
-        /* Reusing your admin styles */
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-        .table-container { background: var(--bg-card); padding: 20px; border-radius: 12px; border: 1px solid var(--border-color); overflow-x: auto; }
-        
-        table { width: 100%; border-collapse: collapse; min-width: 600px; }
-        th { text-align: left; padding: 12px; color: var(--text-muted); border-bottom: 1px solid var(--border-color); }
-        td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.05); color: var(--text-main); }
-        tr:last-child td { border-bottom: none; }
-        
-        .badge-email { background: rgba(59, 130, 246, 0.2); color: #3b82f6; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
-        .badge-sms { background: rgba(245, 158, 11, 0.2); color: #f59e0b; padding: 4px 8px; border-radius: 4px; font-size: 0.8rem; }
-        
-        .action-link { color: var(--primary-color); margin-right: 15px; font-weight: bold; text-decoration: none; }
-        .action-link:hover { text-decoration: underline; }
-        
-        .btn-delete { background: none; border: none; color: #ef4444; cursor: pointer; font-weight: bold; }
-        .btn-delete:hover { text-decoration: underline; }
+        :root { --bg-dark: #0f172a; --panel-bg: #1e293b; --text-main: #f8fafc; --primary: #3b82f6; --border: #334155; }
+        body { background-color: var(--bg-dark); color: var(--text-main); font-family: sans-serif; padding: 20px; max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 10px; }
+        .header-left { display: flex; align-items: center; gap: 15px; }
+        .header h1 { margin: 0; }
+        .btn-primary { background-color: var(--primary); color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        .btn-back { background-color: transparent; border: 1px solid var(--border); color: var(--text-main); padding: 8px 15px; text-decoration: none; border-radius: 5px; font-weight: bold; transition: background 0.2s; }
+        .btn-back:hover { background-color: rgba(255, 255, 255, 0.05); }
+        .success-msg { background: rgba(34, 197, 94, 0.2); color: #4ade80; padding: 10px; border-radius: 5px; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; background-color: var(--panel-bg); margin-bottom: 30px; border-radius: 8px; overflow: hidden; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: #0f172a; color: #94a3b8; font-size: 13px; text-transform: uppercase; }
+        h2 { margin-top: 30px; color: #cbd5e1; font-size: 18px; }
     </style>
 </head>
 <body>
 
-    @include('partials.navbar')
-
-    <div class="container" style="margin-top: 30px;">
-
-        <div class="page-header">
-            <div>
-                <a href="{{ route('admin.dashboard') }}" style="color: var(--text-muted); text-decoration: none; font-size: 0.9rem;">&larr; Back to Dashboard</a>
-                <h1 style="margin-top: 10px;">Manage <span style="color: var(--primary-color);">Scenarios</span></h1>
-            </div>
-            <a href="{{ route('admin.questions.create') }}" class="btn btn-primary">+ Add New Scenario</a>
+    <div class="header">
+        <div class="header-left">
+            <a href="{{ route('admin.dashboard') }}" class="btn-back">&larr; Back</a>
+            <h1>Manage CyberDrill Scenarios</h1>
         </div>
-
-        @if(session('success'))
-            <div style="background: rgba(34, 197, 94, 0.1); color: #22c55e; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #22c55e;">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <div class="table-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 150px;">ID Key</th>
-                        <th>Title</th>
-                        <th>Type</th>
-                        <th>Sender Name</th>
-                        <th style="text-align: right;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($questions as $q)
-                    <tr>
-                        <td style="font-family: monospace; color: var(--text-muted);">{{ $q->key }}</td>
-                        <td style="font-weight: bold;">{{ $q->title }}</td>
-                        <td>
-                            @if($q->type == 'email')
-                                <span class="badge-email">Email</span>
-                            @else
-                                <span class="badge-sms">SMS</span>
-                            @endif
-                        </td>
-                        <td>{{ $q->sender_name }}</td>
-                        <td style="text-align: right;">
-                            <a href="{{ route('admin.questions.edit', $q->id) }}" class="action-link">Edit</a>
-                            
-                            <form action="{{ route('admin.questions.destroy', $q->id) }}" method="POST" style="display:inline;">
-                                @csrf 
-                                @method('DELETE')
-                                <button type="submit" class="btn-delete" onclick="return confirm('Delete this scenario? This cannot be undone.')">Delete</button>
-                            </form>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">
-                            No scenarios found. <a href="{{ route('admin.questions.create') }}" style="color: var(--primary-color);">Create one now</a>.
-                        </td>
-                    </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-
+        <a href="{{ route('questions.create') }}" class="btn-primary">+ Add New Scenario</a>
     </div>
 
-    <script>
-        if (localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-    </script>
+    @if(session('success'))
+        <div class="success-msg">{{ session('success') }}</div>
+    @endif
+
+    <h2>Phishing Scenarios</h2>
+    <table>
+        <tr><th>ID</th><th>Title</th><th>Sender Email</th><th>Type</th><th>Actions</th></tr>
+        @forelse($phishingScenarios as $p)
+            <tr>
+                <td>{{ $p->id }}</td>
+                <td>{{ $p->title }}</td>
+                <td>{{ $p->sender_email }}</td>
+                <td>{{ $p->is_phishing ? 'Malicious' : 'Safe' }}</td>
+                <td style="display: flex; gap: 10px;">
+                    <a href="{{ route('questions.edit', ['question' => $p->id, 'module' => 'phishing']) }}" style="color:var(--primary); text-decoration:none;">Edit</a>
+                    <form action="{{ route('questions.destroy', $p->id) }}" method="POST" style="margin:0;">
+                        @csrf @method('DELETE')
+                        <input type="hidden" name="module" value="phishing">
+                        <button type="submit" onclick="return confirm('Delete Phishing Scenario?');" style="background:none; border:none; color:#ef4444; cursor:pointer;">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr><td colspan="5">No phishing scenarios found.</td></tr>
+        @endforelse
+    </table>
+
+    <h2>Malware Scenarios</h2>
+    <table>
+        <tr><th>ID</th><th>Title</th><th>File Name</th><th>Publisher</th><th>Actions</th></tr>
+        @forelse($malwareScenarios as $m)
+            <tr>
+                <td>{{ $m->id }}</td>
+                <td>{{ $m->title }}</td>
+                <td>{{ $m->filename }}</td>
+                <td>{{ $m->publisher }}</td>
+                <td style="display: flex; gap: 10px;">
+                    <a href="{{ route('questions.edit', ['question' => $m->id, 'module' => 'malware']) }}" style="color:var(--primary); text-decoration:none;">Edit</a>
+                    <form action="{{ route('questions.destroy', $m->id) }}" method="POST" style="margin:0;">
+                        @csrf @method('DELETE')
+                        <input type="hidden" name="module" value="malware">
+                        <button type="submit" onclick="return confirm('Delete Malware Scenario?');" style="background:none; border:none; color:#ef4444; cursor:pointer;">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr><td colspan="5">No malware scenarios found.</td></tr>
+        @endforelse
+    </table>
+
+    <h2>Spam Scenarios</h2>
+    <table>
+        <tr><th>ID</th><th>Title</th><th>Sender Name</th><th>Type</th><th>Actions</th></tr>
+        @forelse($Question as $s)
+            <tr>
+                <td>{{ $s->id }}</td>
+                <td>{{ $s->title }}</td>
+                <td>{{ $s->sender_name }}</td>
+                <td>{{ $s->type }}</td>
+                <td style="display: flex; gap: 10px;">
+                    <a href="{{ route('questions.edit', ['question' => $s->id, 'module' => 'spam']) }}" style="color:var(--primary); text-decoration:none;">Edit</a>
+                    <form action="{{ route('questions.destroy', $s->id) }}" method="POST" style="margin:0;">
+                        @csrf @method('DELETE')
+                        <input type="hidden" name="module" value="spam">
+                        <button type="submit" onclick="return confirm('Delete Spam Scenario?');" style="background:none; border:none; color:#ef4444; cursor:pointer;">Delete</button>
+                    </form>
+                </td>
+            </tr>
+        @empty
+            <tr><td colspan="5">No spam scenarios found.</td></tr>
+        @endforelse
+    </table>
+
 </body>
 </html>
