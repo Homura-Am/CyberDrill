@@ -1,7 +1,12 @@
 FROM php:8.4-apache
 
 # 1. Install required Linux tools and PostgreSQL drivers
-RUN apt-get update && apt-get install -y libpq-dev zip unzip git
+RUN apt-get update && apt-get install -y libpq-dev zip unzip git curl
+
+# 1.5 Install Node.js (Needed for Vite)
+RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+    && apt-get install -y nodejs
+
 RUN docker-php-ext-install pdo pdo_pgsql
 
 # 2. Enable Apache rewrite module (Needed for Laravel routes)
@@ -22,8 +27,12 @@ COPY . .
 COPY --from=composer:latest /usr/bin/composer /usr/local/bin/composer
 RUN composer install --no-dev --optimize-autoloader
 
-# 7. Give Laravel permission to save files (like sessions and caches)
+# 7. Install NPM packages and Build Vite Assets
+RUN npm install
+RUN npm run build
+
+# 8. Give Laravel permission to save files (like sessions and caches)
 RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# 8. Command to run when the server starts
+# 9. Command to run when the server starts
 CMD php artisan migrate --force && apache2-foreground
