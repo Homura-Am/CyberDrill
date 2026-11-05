@@ -525,7 +525,7 @@
             showFeedback(true, message);
         } else {
             stats.errors++;
-            stats.health = Math.max(0, stats.health - 15);
+            stats.health = Math.max(0, stats.health - 10);
             sfx.wrong.play();
             
             if(stats.health === 0) {
